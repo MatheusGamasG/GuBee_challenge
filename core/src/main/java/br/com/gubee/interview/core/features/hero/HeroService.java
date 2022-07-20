@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.gubee.interview.core.features.powerstats.PowerStatsService;
+import br.com.gubee.interview.core.model.CompareDTO;
 import br.com.gubee.interview.core.model.Hero;
 
 @Service
@@ -41,6 +42,17 @@ public class HeroService {
 		} catch (RuntimeException e) {
 			return null;
 		}
+	}
+	
+	public CompareDTO compareHeros(CompareDTO compare) {
+		Hero hero1 = heroRep.findOne(compare.getHero1_ID());
+		Hero hero2 = heroRep.findOne(compare.getHero2_ID());
+		
+		compare.setStrengthDiff(hero1.getPowerStatsId().getStrength() - hero2.getPowerStatsId().getStrength());
+		compare.setAgilityDiff(hero1.getPowerStatsId().getAgility() - hero2.getPowerStatsId().getAgility());
+		compare.setDexterityDiff(hero1.getPowerStatsId().getDexterity() - hero2.getPowerStatsId().getDexterity());
+		compare.setIntelligenceDiff(hero1.getPowerStatsId().getIntelligence() - hero2.getPowerStatsId().getIntelligence());
+		return compare;
 	}
 	
 	public Hero updateHero(String id, Hero hero) {
