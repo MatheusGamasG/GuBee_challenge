@@ -12,7 +12,7 @@ public class Hero {
 	private String name;
 	private String race;
 	@Column("power_stats_id")
-	private PowerStats powerStatsId;
+	private PowerStats powerStats;
 	private boolean enabled;
 	private Date created_at;
 	private Date updated_at;
@@ -20,7 +20,7 @@ public class Hero {
 	public Hero(String name, String race, PowerStats powerStatsId, boolean enabled) {
 		this.name = name;
 		this.race = race;
-		this.powerStatsId = powerStatsId;
+		this.powerStats = powerStatsId;
 		this.enabled = enabled;
 	}
 	
@@ -37,10 +37,10 @@ public class Hero {
 		this.race = race;
 	}
 	public PowerStats getPowerStatsId() {
-		return powerStatsId;
+		return powerStats;
 	}
 	public void setPowerStatsId(PowerStats power_stats_id) {
-		this.powerStatsId = power_stats_id;
+		this.powerStats = power_stats_id;
 	}
 	public boolean isEnabled() {
 		return enabled;
