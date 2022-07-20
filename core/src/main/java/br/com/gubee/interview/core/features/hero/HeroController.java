@@ -1,14 +1,16 @@
 package br.com.gubee.interview.core.features.hero;
 
-import java.util.UUID;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,20 +26,14 @@ public class HeroController {
 	@Autowired
 	private HeroService heroService;
 		
-	@GetMapping() 
-	public String print() {
-		return "Hello World!";
-	}
-	
 	@GetMapping("/hero/{id}")
-	public ResponseEntity<Hero> findHeroById(@PathVariable UUID id) {
+	public ResponseEntity<Hero> findHeroById(@PathVariable String id) {
 		
 		Hero hero = heroService.getHeroById(id);
 		
 		if(hero == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(hero);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
-		
 		return ResponseEntity.status(HttpStatus.OK).body(hero);
 	}
 	
@@ -56,4 +52,33 @@ public class HeroController {
 	public ResponseEntity<Hero> createHero(@RequestBody Hero hero) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(heroService.createHero(hero));
 	}
+	
+	@PutMapping("/hero/{id}")
+	public ResponseEntity<Hero> updateHero(@PathVariable String id, @RequestBody Hero hero) {
+		
+		if(heroService.getHeroById(id) == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+		
+		return ResponseEntity.status(HttpStatus.OK).body(heroService.updateHero(id, hero));		
+	}
+	
+	@DeleteMapping("/hero/{id}")
+	public ResponseEntity<String> deleteHero(@PathVariable String id) {
+		
+		boolean status;
+		
+		try {
+			status = heroService.deleteHeroById(id);	
+		} catch (Exception e) {
+			status = false;
+		}
+		
+		if(status) {
+			return ResponseEntity.status(HttpStatus.OK).build();
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}		
+	}
+
 }

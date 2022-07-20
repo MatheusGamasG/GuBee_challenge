@@ -22,9 +22,10 @@ public class HeroRepository {
 	  }
 	  
 	  public Hero save(Hero hero) {
-		  String sqlQuery = "INSERT INTO interview_service.hero(name, race, power_stats_id, enabled) " +
-		                    "VALUES (?, ?, ?, ?)";
+		  String sqlQuery = "INSERT INTO interview_service.hero(id, name, race, power_stats_id, enabled) " +
+		                    "VALUES (?, ?, ?, ?, ?)";
 		  jdbcTemplate.update(sqlQuery,
+				  			  hero.getId(),
 				  			  hero.getName(),
 				  			  hero.getRace(),
 				  			  hero.getPowerStatsId().getId(),
@@ -32,18 +33,18 @@ public class HeroRepository {
 		  return hero;
 	}
 	  
-	public Hero findOne(UUID id) {
-		String sqlQuery = "SELECT name, race, enabled, strength, agility, dexterity, intelligence "
+	public Hero findOne(String id) {
+		String sqlQuery = "SELECT name, race, enabled, power_stats_id, strength, agility, dexterity, intelligence "
 				+ "FROM interview_service.hero "
 				+ "INNER JOIN interview_service.power_stats "
 				+ "ON interview_service.hero.power_stats_id=interview_service.power_stats.id "
 				+ "WHERE interview_service.hero.id = ?";
 		
-		return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToHero, id);
+		return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToHero, UUID.fromString(id));
 	}
 	
 	public Hero findOneByName(String name) {
-		String sqlQuery = "SELECT name, race, enabled, strength, agility, dexterity, intelligence "
+		String sqlQuery = "SELECT name, race, enabled, power_stats_id, strength, agility, dexterity, intelligence "
 				+ "FROM interview_service.hero "
 				+ "INNER JOIN interview_service.power_stats "
 				+ "ON interview_service.hero.power_stats_id=interview_service.power_stats.id "
@@ -52,11 +53,27 @@ public class HeroRepository {
 		return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToHero, name);
 	}
 	
-	private Hero mapRowToHero(ResultSet resultSet, int rowNum) throws SQLException {
-		
+	private Hero mapRowToHero(ResultSet resultSet, int rowNum) throws SQLException {		
 	    PowerStats ps = new PowerStats(resultSet.getInt("strength"), resultSet.getInt("agility"), resultSet.getInt("dexterity"), resultSet.getInt("intelligence"));
-		Hero hero = new Hero(resultSet.getString("name"), resultSet.getString("race"), ps, resultSet.getBoolean("enabled"));
+	    
+	    ps.setId((java.util.UUID) resultSet.getObject("power_stats_id"));   	
+
+		Hero hero = new Hero(resultSet.getString("name"), resultSet.getString("race"), ps, resultSet.getBoolean("enabled"));		
+		return hero;
+	}
+	
+	public Hero updateHero(Hero hero) {
+		String sqlQuery = "UPDATE interview_service.hero SET "
+				+ "name = ?, race = ?, enabled = ?, power_stats_id = ?"
+				+ "WHERE id = ?";
+		
+		jdbcTemplate.update(sqlQuery, hero.getName(), hero.getRace(), hero.isEnabled(), hero.getPowerStatsId().getId(), hero.getId());
 		
 		return hero;
+	}
+	
+	public boolean deleteById(String id) {
+		  String sqlQuery = "DELETE FROM interview_service.hero WHERE id = ?";
+		  return jdbcTemplate.update(sqlQuery, UUID.fromString(id)) > 0;
 	}
 }

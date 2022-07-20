@@ -1,7 +1,5 @@
 package br.com.gubee.interview.core.features.powerstats;
 
-import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -18,7 +16,7 @@ public class PowerStatsRepository {
         this.jdbcTemplate = jdbcTemplate;;
     }
 	  
-	public UUID createPowerStats(PowerStats powerStats) {
+	public PowerStats save(PowerStats powerStats) {
 		String sqlQuery = "INSERT INTO interview_service.power_stats(id, strength, agility, dexterity, intelligence) "
 				+ "VALUES (?, ?, ?, ?, ?)";
 		jdbcTemplate.update(sqlQuery,
@@ -27,6 +25,16 @@ public class PowerStatsRepository {
 				powerStats.getAgility(),
 				powerStats.getDexterity(),
 				powerStats.getIntelligence());
-		return powerStats.getId();
+		return powerStats;
+	}
+	
+	public PowerStats updatePowerStats(PowerStats powerStats) {
+		String sqlQuery = "UPDATE interview_service.power_stats SET "
+				+ "strength = ?, agility = ?, dexterity = ?, intelligence = ? "
+				+ "WHERE id = ?";
+		
+		jdbcTemplate.update(sqlQuery, powerStats.getStrength(), powerStats.getAgility(), powerStats.getDexterity(), powerStats.getIntelligence(), powerStats.getId());
+		
+		return powerStats;
 	}
 }
